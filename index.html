@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0918" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F6F4FF" media="(prefers-color-scheme: light)" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="StastistikDompet" />
+  <meta name="application-name" content="StastistikDompet" />
+  <meta name="description" content="Aplikasi pencatat keuangan, tagihan, dan tugas kampus untuk anak kos." />
+
+  <!-- PWA: manifest & ikon aplikasi -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167.png" />
+
+  <title>StastistikDompet — Keuangan Anak Kos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&family=Kaushan+Script&display=swap" rel="stylesheet" />
+  <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("theme")||"dark")}catch(e){}</script>
+  <link rel="stylesheet" href="Sytle.css">
+</head>
+<body>
+  <!-- Logo kontrakan (dipakai di sidebar, header HP, dan layar login) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="bgGrad" x1="46" y1="186" x2="168" y2="18" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#6A3BEA"/><stop offset=".55" stop-color="#7C4DFF"/><stop offset="1" stop-color="#A67FFF"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="72%" cy="14%" r="60%">
+        <stop offset="0" stop-color="#ffffff" stop-opacity=".30"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="doorGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7B4DF3"/><stop offset="1" stop-color="#6D3FEA"/>
+      </linearGradient>
+      <linearGradient id="coinGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#FFB84D"/><stop offset="1" stop-color="#F59A1F"/>
+      </linearGradient>
+
+      <symbol id="logoKontrakan" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="96" fill="url(#bgGrad)"/>
+        <circle cx="100" cy="100" r="96" fill="url(#glow)"/>
+        <circle cx="100" cy="100" r="95" fill="none" stroke="#ffffff" stroke-opacity=".2" stroke-width="2"/>
+        <g>
+          <path d="M50 106 100 62l50 44" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M63 99 100 66l37 33v43a6 6 0 0 1-6 6H69a6 6 0 0 1-6-6Z" fill="#fff"/>
+          <path d="M88 148v-21a12 12 0 0 1 24 0v21Z" fill="url(#doorGrad)"/>
+          <circle cx="100" cy="89" r="10" fill="url(#coinGrad)"/>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-mark"><svg class="logo-svg" viewBox="0 0 200 200" aria-hidden="true"><use href="#logoKontrakan"/></svg></div>
+        <div class="brand-name" style="color:var(--ink)">Stastistik<span style="color:var(--primary)">Dompet</span></div>
+      </div>
+
+      <div id="loginFormWrapper">
+        <h2>Masuk ke Akun</h2>
+        <p class="muted">Masukkan username dan password kamu</p>
+        <form id="loginForm" class="login-form">
+          <div class="form-group">
+            <label for="loginUsername">Username</label>
+            <input type="text" id="loginUsername" placeholder="Masukkan username" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="loginPassword" placeholder="Masukkan password" required>
+              <button type="button" id="toggleLoginPassword" class="toggle-pw">👁️</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-save">Masuk</button>
+        </form>
+        <p id="loginMsg" class="profile-msg"></p>
+        <p class="switch-auth">Belum punya akun? <a href="#" id="showRegister">Daftar di sini</a></p>
+      </div>
+
+      <div id="registerFormWrapper" style="display:none;">
+        <h2>Buat Akun Baru</h2>
+        <p class="muted">Isi data untuk membuat akun StastistikDompet</p>
+        <form id="registerForm" class="login-form">
+          <div class="form-group">
+            <label for="registerName">Nama</label>
+            <input type="text" id="registerName" placeholder="Masukkan nama kamu" required>
+          </div>
+          <div class="form-group">
+            <label for="registerUsername">Username</label>
+            <input type="text" id="registerUsername" placeholder="Buat username" required>
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="registerPassword" placeholder="Buat password" required>
+              <button type="button" id="toggleRegisterPassword" class="toggle-pw">👁️</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-save">Daftar & Masuk</button>
+        </form>
+        <p id="registerMsg" class="profile-msg"></p>
+        <p class="switch-auth">Sudah punya akun? <a href="#" id="showLogin">Masuk di sini</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="appRoot" style="display:none;">
+  <div class="app">
+    <aside class="sidebar">
+      <a href="#" class="brand" id="brandHome" title="Ke Dashboard"><div class="brand-mark"><svg class="logo-svg" viewBox="0 0 200 200" aria-hidden="true"><use href="#logoKontrakan"/></svg></div><div class="brand-name">Stastistik<span>Dompet </span></div></a>
+      <div class="menu-label">Menu Utama</div>
+      <nav class="nav">
+        <a href="#" class="menu-item" data-page="profil"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><circle cx="10" cy="6.7" r="3.2"/><path d="M3.5 17c1-3.4 4-4.8 6.5-4.8s5.5 1.4 6.5 4.8"/></svg></span><span>Profil</span></a>
+        <a href="#" class="menu-item active" data-page="dashboard"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><rect x="3" y="3" width="6" height="6" rx="1.4"/><rect x="11" y="3" width="6" height="6" rx="1.4"/><rect x="3" y="11" width="6" height="6" rx="1.4"/><rect x="11" y="11" width="6" height="6" rx="1.4"/></svg></span><span>Dashboard</span></a>
+        <a href="#" class="menu-item" data-page="transaksi"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M4 7h11M15 7l-3-3M15 7l-3 3"/><path d="M16 13H5M5 13l3-3M5 13l3 3"/></svg></span><span>Transaksi</span></a>
+        <a href="#" class="menu-item" data-page="anggaran"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.7"/><path d="M10 3.3V10l4.7 4.7"/></svg></span><span>Anggaran</span></a>
+        <a href="#" class="menu-item" data-page="dompet"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M3 6.5c0-1 .8-1.8 1.8-1.8h9.4c1 0 1.8.8 1.8 1.8v7c0 1-.8 1.8-1.8 1.8H4.8C3.8 15.3 3 14.5 3 13.5v-7Z"/><path d="M13.2 10.2h2.6"/></svg></span><span>Dompet</span></a>
+        <a href="#" class="menu-item" data-page="tagihan"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/><path d="M7.4 12.4l1.8 1.8 3.4-3.6"/></svg></span><span>Tagihan</span><span class="menu-dot" id="menuBillDot" style="display:none"></span></a>
+        <a href="#" class="menu-item" data-page="tugas"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M6 2.5h8a1.5 1.5 0 0 1 1.5 1.5v12.4a1 1 0 0 1-1.45.9L10 15.6l-4.05 1.7A1 1 0 0 1 4.5 16.4V4A1.5 1.5 0 0 1 6 2.5Z"/><path d="M7 7h6M7 10h6M7 13h3.5"/></svg></span><span>Tugas Kampus</span><span class="menu-dot" id="menuTaskDot" style="display:none"></span></a>
+        <a href="#" class="menu-item" data-page="laporan"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M4 16V9M10 16V4M16 16v-6.5"/></svg></span><span>Laporan</span></a>
+        <a href="#" class="menu-item" data-page="kalkulator"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><rect x="4" y="2.5" width="12" height="15" rx="2.2"/><line x1="6.3" y1="5.6" x2="13.7" y2="5.6"/><circle cx="6.8" cy="9.3" r=".85" fill="currentColor" stroke="none"/><circle cx="10" cy="9.3" r=".85" fill="currentColor" stroke="none"/><circle cx="13.2" cy="9.3" r=".85" fill="currentColor" stroke="none"/><circle cx="6.8" cy="12.2" r=".85" fill="currentColor" stroke="none"/><circle cx="10" cy="12.2" r=".85" fill="currentColor" stroke="none"/><circle cx="13.2" cy="12.2" r=".85" fill="currentColor" stroke="none"/><circle cx="6.8" cy="15.1" r=".85" fill="currentColor" stroke="none"/><circle cx="10" cy="15.1" r=".85" fill="currentColor" stroke="none"/><circle cx="13.2" cy="15.1" r=".85" fill="currentColor" stroke="none"/></svg></span><span>Kalkulator</span></a>
+        <a href="#" class="menu-item" data-page="asisten"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M4 4.5h12v8.5H8.5L5 16v-3H4V4.5Z"/><circle cx="7.3" cy="8.7" r=".9" fill="currentColor" stroke="none"/><circle cx="10" cy="8.7" r=".9" fill="currentColor" stroke="none"/><circle cx="12.7" cy="8.7" r=".9" fill="currentColor" stroke="none"/></svg></span><span>Asisten AI</span></a>
+        <a href="#" class="menu-item" data-page="media"><span class="nav-icon"><svg class="icon" viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="12" rx="2"/><circle cx="7" cy="8.3" r="1.4"/><path d="M2.5 14l4.3-4.3a1.6 1.6 0 0 1 2.3 0L13 13.5"/><path d="M11.8 12.3l1.5-1.5a1.6 1.6 0 0 1 2.3 0l2 2"/></svg></span><span>Galeri</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="mini-card"><p id="miniGoalLabel">Target tabungan</p><strong id="miniGoalAmount">Belum diatur</strong><div class="progress"><i id="miniGoalProgress"></i></div></div>
+        <button id="logoutBtn" class="logout-btn">⎋ Keluar</button>
+      </div>
+    </aside>
+
+    <main id="dashboard">
+      <header class="topbar">
+        <a href="#" class="topbar-brand" id="topbarBrand" aria-label="StastistikDompet, ke Beranda"><span class="topbar-logo"><svg class="logo-svg" viewBox="0 0 200 200" aria-hidden="true"><use href="#logoKontrakan"/></svg></span></a>
+        <div class="greeting"><h1 id="greetingTitle">Halo, Anak Kos!</h1><p class="greeting-sub">Semangat terus, atur keuangan untuk masa depan yang lebih baik!</p></div>
+        <div class="date-pill"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="13" rx="2.4"/><path d="M3 8.2h14M7 2.6v3M13 2.6v3"/><path d="M7.4 12.4l1.8 1.8 3.4-3.6"/></svg><span id="greetingDate">Kamis, 17 September 2026</span></div>
+        <div class="top-actions">
+          <div class="outlined-field"><span class="outlined-label">Periode</span><select class="month-filter" id="monthFilter"></select></div>
+          <button class="icon-btn" id="installAppBtn" aria-label="Install aplikasi" title="Install aplikasi ke perangkat" style="display:none">📲</button>
+          <button class="icon-btn" id="themeToggle" aria-label="Ganti tema" title="Ganti tema terang/gelap">🌙</button>
+          <div class="notif-wrap">
+            <button class="icon-btn" id="notifBtn" aria-label="Notifikasi" title="Peringatan anggaran & tagihan jatuh tempo"><svg class="icon" viewBox="0 0 20 20"><path d="M5 8a5 5 0 0 1 10 0c0 2.4.6 3.8 1.3 4.6H3.7C4.4 11.8 5 10.4 5 8Z"/><path d="M8.2 15.4a1.8 1.8 0 0 0 3.6 0"/></svg><span class="notif-badge" id="notifBadge" style="display:none">0</span></button>
+            <div class="notif-dropdown" id="notifDropdown">
+              <div class="notif-title">Peringatan</div>
+              <div id="notifList"></div>
+            </div>
+          </div>
+          <div class="avatar-wrap">
+            <button type="button" class="avatar" id="avatarBtn">AP</button>
+            <div class="avatar-dropdown" id="avatarDropdown">
+              <div class="dropdown-photo-row">
+                <div class="avatar avatar-lg" id="dropdownAvatarPreview">AP</div>
+                <div class="dropdown-photo-actions">
+                  <label for="avatarUploadInput" class="btn-upload-photo">Ubah Foto</label>
+                  <input type="file" id="avatarUploadInput" accept="image/*" hidden>
+                  <button type="button" class="btn-remove-photo" id="removePhotoBtn">Hapus Foto</button>
+                </div>
+              </div>
+              <div class="dropdown-info">
+                <div class="dropdown-name" id="dropdownName">Anak Pos</div>
+                <div class="dropdown-username" id="dropdownUsername">@username</div>
+              </div>
+              <a href="#" class="dropdown-link" id="dropdownViewProfile">👤 Lihat Profil Lengkap</a>
+              <button type="button" class="dropdown-link dropdown-logout" id="dropdownLogout">⎋ Keluar</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="page-section" id="page-profil">
+        <div class="card profile-card">
+          <div class="section-head">
+            <h2>Profil Saya</h2>
+            <p class="muted">Kelola informasi akun kamu</p>
+          </div>
+
+          <form id="profileForm" class="profile-form">
+            <div class="form-group">
+              <label for="profileName">Nama</label>
+              <input type="text" id="profileName" placeholder="Masukkan nama kamu" required>
+            </div>
+
+            <div class="form-group">
+              <label for="profileUsername">Username</label>
+              <input type="text" id="profileUsername" placeholder="Masukkan username" required>
+            </div>
+
+            <div class="form-group">
+              <label for="profilePassword">Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="profilePassword" placeholder="Masukkan password baru">
+                <button type="button" id="togglePassword" class="toggle-pw">👁️</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="profilePayday">Tanggal Gajian / Uang Bulanan (1-31)</label>
+              <input type="number" id="profilePayday" min="1" max="31" placeholder="Contoh: 25">
+            </div>
+
+            <button type="submit" class="btn-save">Simpan Perubahan</button>
+          </form>
+
+          <div class="section-head" style="margin-top:28px;padding-top:20px;border-top:1px solid var(--line)">
+            <h2>🤖 Asisten AI</h2>
+            <p class="muted" id="aiProviderDesc">Pakai GroqCloud — gratis, cepat, tanpa kartu kredit. Ambil API key di <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>, lalu tempel di sini.</p>
+          </div>
+          <div class="form-group">
+            <label for="aiProviderSelect">Pilih AI</label>
+            <select id="aiProviderSelect">
+              <option value="groq">Groq (cepat, default)</option>
+              <option value="gemini">Google Gemini</option>
+            </select>
+          </div>
+          <form id="aiKeyForm" class="profile-form">
+            <div class="form-group">
+              <label for="aiApiKey" id="aiApiKeyLabel">Groq API Key</label>
+              <div class="password-wrapper">
+                <input type="password" id="aiApiKey" placeholder="Tempel API key kamu di sini (diawali gsk_...)">
+                <button type="button" id="toggleAiKey" class="toggle-pw">👁️</button>
+              </div>
+            </div>
+            <button type="submit" class="btn-save">💾 Simpan API Key</button>
+            <button type="button" class="btn-outline" id="clearAiKeyBtn" style="margin-top:10px">🗑 Hapus API Key</button>
+          </form>
+          <p id="aiKeyMsg" class="profile-msg"></p>
+          <p class="wallet-note" id="aiKeyNote">API key disimpan langsung di browser kamu (localStorage), tidak dikirim ke server manapun selain langsung ke Groq. Jangan bagikan key ini ke orang lain.</p>
+
+          <p id="profileMsg" class="profile-msg"></p>
+
+          <div class="section-head" style="margin-top:28px;padding-top:20px;border-top:1px solid var(--line)">
+            <h2>Cadangkan Data</h2>
+            <p class="muted">Backup semua data kamu ke file, atau impor dari backup sebelumnya</p>
+          </div>
+          <div class="backup-actions">
+            <button type="button" class="btn-outline" id="backupDataBtn">⬇️ Backup Data (JSON)</button>
+            <label class="btn-outline" for="restoreDataInput" style="cursor:pointer">⬆️ Impor Data</label>
+            <input type="file" id="restoreDataInput" accept="application/json" hidden>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section active" id="page-dashboard">
+        <div class="payday-banner" id="paydayBanner" style="display:none"></div>
+        <div class="bill-banner" id="billBanner" style="display:none"></div>
+
+        <section class="summary-grid">
+          <article class="card summary-card balance"><svg class="balance-art" viewBox="0 0 240 180" aria-hidden="true" focusable="false">
+<defs>
+<linearGradient id="baW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B7BFF"/><stop offset="1" stop-color="#5A2FE0"/></linearGradient>
+<linearGradient id="baF" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B9A1FF"/><stop offset="1" stop-color="#7C55F2"/></linearGradient>
+<linearGradient id="baC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD76A"/><stop offset="1" stop-color="#F59E0B"/></linearGradient>
+<linearGradient id="baL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4A22C4"/><stop offset="1" stop-color="#2A0F8A"/></linearGradient>
+</defs>
+<path d="M18 168C10 138 24 116 52 108 44 132 48 150 70 166Z" fill="url(#baL)" opacity=".85"/>
+<path d="M56 176C52 150 70 132 96 132 90 152 96 168 112 176Z" fill="url(#baL)" opacity=".75"/>
+<path d="M214 172C204 146 214 124 238 114 236 140 242 156 236 176Z" fill="url(#baL)" opacity=".8"/>
+<g transform="rotate(-14 130 110)">
+<rect x="70" y="66" width="128" height="92" rx="20" fill="url(#baW)"/>
+<path d="M70 92c0-14 10-26 26-26h72c-14 0-24 8-30 22l-4 10H70V92Z" fill="url(#baF)" opacity=".9"/>
+<rect x="70" y="66" width="128" height="92" rx="20" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="2"/>
+<rect x="158" y="96" width="50" height="34" rx="14" fill="#5A2FE0"/>
+<rect x="158" y="96" width="50" height="34" rx="14" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2"/>
+<circle cx="180" cy="113" r="7" fill="#FF9F43"/><circle cx="178" cy="111" r="2.4" fill="#FFD9A8"/>
+</g>
+<g transform="rotate(-8 128 62)">
+<circle cx="128" cy="62" r="34" fill="url(#baC)"/>
+<circle cx="128" cy="62" r="27" fill="none" stroke="#FFF3C4" stroke-opacity=".8" stroke-width="2.4"/>
+<text x="128" y="72" text-anchor="middle" font-family="Poppins,Arial,sans-serif" font-size="27" font-weight="700" fill="#FFF7DC" stroke="#E08A00" stroke-width=".8" paint-order="stroke">Rp</text>
+</g>
+<g transform="rotate(-24 62 74)"><ellipse cx="62" cy="74" rx="15" ry="15" fill="url(#baC)"/><ellipse cx="62" cy="74" rx="10.5" ry="10.5" fill="none" stroke="#FFF3C4" stroke-opacity=".8" stroke-width="1.6"/></g>
+<g transform="rotate(-8 214 152)"><ellipse cx="214" cy="152" rx="17" ry="8" fill="#E08A00"/><ellipse cx="214" cy="149" rx="17" ry="8" fill="url(#baC)"/><ellipse cx="214" cy="149" rx="10" ry="4.6" fill="none" stroke="#FFF3C4" stroke-opacity=".8" stroke-width="1.4"/></g>
+</svg><div class="summary-heading"><span>Saldo Tersisa</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><rect x="2.5" y="5" width="15" height="11" rx="2.4"/><path d="M2.5 8.5h15"/><circle cx="13.5" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg></span></div><div class="amount" id="balanceAmount">Rp0</div><div class="change" id="balanceChange">Belum ada transaksi bulan ini</div></article>
+          <article class="card summary-card income"><svg class="trend-art" viewBox="0 0 48 28" aria-hidden="true" focusable="false"><path d="M3 24l11-10 8 5 12-12"/><path d="M28 6h8v8"/></svg><div class="summary-heading"><span>Total Pemasukan</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M5 8l5 5 5-5"/><path d="M10 13V3"/></svg></span></div><div class="amount" id="incomeAmount">Rp0</div><div class="change" id="incomeChange">Tambahkan pemasukan pertama</div></article>
+          <article class="card summary-card expense"><svg class="trend-art" viewBox="0 0 48 28" aria-hidden="true" focusable="false"><path d="M3 24l11-10 8 5 12-12"/><path d="M28 6h8v8"/></svg><div class="summary-heading"><span>Total Pengeluaran</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M5 12l5-5 5 5"/><path d="M10 7v10"/></svg></span></div><div class="amount" id="expenseAmount">Rp0</div><div class="change" id="expenseChange">Belum ada pengeluaran tercatat</div></article>
+        </section>
+
+        <nav class="quick-actions" aria-label="Pintasan">
+          <button type="button" class="qa-item" data-go="anggaran"><span class="qa-ico"><svg class="icon" viewBox="0 0 20 20"><path d="M8.6 3.1a7 7 0 1 0 8.3 8.3H8.6V3.1Z"/><path d="M11.6 2.9a7 7 0 0 1 5.5 5.5h-5.5V2.9Z"/></svg></span><span>Anggaran</span></button>
+          <button type="button" class="qa-item" data-go="tugas"><span class="qa-ico"><svg class="icon" viewBox="0 0 20 20"><path d="M6 2.5h8a1.5 1.5 0 0 1 1.5 1.5v12.4a1 1 0 0 1-1.45.9L10 15.6l-4.05 1.7A1 1 0 0 1 4.5 16.4V4A1.5 1.5 0 0 1 6 2.5Z"/><path d="M7 7h6M7 10h6M7 13h3.5"/></svg></span><span>Tugas</span></button>
+          <button type="button" class="qa-item" data-go="kalkulator"><span class="qa-ico"><svg class="icon" viewBox="0 0 20 20"><rect x="4" y="2.5" width="12" height="15" rx="2.2"/><path d="M6.3 5.6h7.4"/><circle cx="7" cy="9.3" r=".7"/><circle cx="10" cy="9.3" r=".7"/><circle cx="13" cy="9.3" r=".7"/><circle cx="7" cy="12.6" r=".7"/><circle cx="10" cy="12.6" r=".7"/><circle cx="13" cy="12.6" r=".7"/></svg></span><span>Kalkulator</span></button>
+          <button type="button" class="qa-item" data-go="asisten"><span class="qa-ico"><svg class="icon" viewBox="0 0 20 20"><path d="M4 4.5h12v8.5H8.5L5 16v-3H4V4.5Z"/><path d="M7.3 8.7h.01M10 8.7h.01M12.7 8.7h.01"/></svg></span><span>Asisten AI</span></button>
+          <button type="button" class="qa-item" data-go="media"><span class="qa-ico"><svg class="icon" viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="12" rx="2"/><circle cx="7" cy="8.3" r="1.4"/><path d="M2.5 14l4.3-4.3a1.6 1.6 0 0 1 2.3 0L13 13.5"/></svg></span><span>Galeri</span></button>
+        </nav>
+
+        <section class="dashboard-grid">
+          <article class="card chart-card" id="laporan">
+            <div class="section-head">
+              <div><h2>Arus Keuangan</h2><p>Perbandingan pemasukan dan pengeluaran mingguan</p></div>
+              <div class="period-tabs">
+                <button type="button" class="btn btn-secondary" id="exportCsvBtn" style="padding:6px 10px;font-size:11px">⬇️ CSV</button>
+                <button type="button" class="btn btn-secondary" id="printReportBtn" style="padding:6px 10px;font-size:11px">🖨️ Cetak</button>
+              </div>
+            </div>
+            <div class="chart-area">
+              <canvas id="trendChart" style="display:none"></canvas>
+              <div class="empty-chart" id="chartEmptyState"><div><svg class="icon empty-chart-icon" viewBox="0 0 40 40" style="width:34px;height:34px;margin:0 auto 10px;color:var(--muted)"><path d="M6 32V18M15 32V8M24 32V22M33 32V13"/></svg><strong>Belum ada data keuangan</strong><span>Grafik akan tampil setelah Anda menambahkan transaksi.</span></div></div>
+            </div>
+            <div class="chart-legend"><span><i class="dot" style="background:#2DD4A0"></i>Pemasukan</span><span><i class="dot" style="background:#FF6B81"></i>Pengeluaran</span></div>
+          </article>
+
+          <div class="dashboard-side">
+            <article class="card budget-card" id="anggaran">
+              <div class="section-head"><div><h2>Anggaran Bulanan</h2><p>Kontrol pengeluaranmu</p></div><button type="button" class="btn btn-secondary" id="openBudgetModal" style="padding:6px 10px;font-size:11px">⚙ Atur</button></div>
+              <div class="budget-list" id="budgetList"></div>
+              <div class="budget-note" id="budgetNote">Mulai atur anggaran dan catat transaksi untuk memantau keuangan kos.</div>
+              <div class="budget-insight" id="budgetInsight"></div>
+            </article>
+
+            <article class="card savings-goal-card" id="savingsGoalCard" style="display:none">
+              <div class="section-head"><div><h2>🎯 Target Tabungan</h2><p id="goalCardSubtitle">-</p></div><button type="button" class="btn btn-secondary" id="goToKalkulatorBtn" style="padding:6px 10px;font-size:11px">Kelola →</button></div>
+              <div class="budget-bar"><i id="goalCardProgressBar" style="width:0%;background:var(--gold)"></i></div>
+              <div class="change" id="goalCardProgressText" style="margin-top:10px"></div>
+            </article>
+
+            <article class="card bill-widget-card" id="taskWidget">
+              <div class="section-head">
+                <div><h2><span class="wg-ico wg-task"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4 2.2 8 10 12l7.8-4L10 4Z"/><path d="M5.2 9.9v3.3c0 1.1 2.1 2.2 4.8 2.2s4.8-1.1 4.8-2.2V9.9"/><path d="M17.8 8v4.6"/></svg></span>Tugas</h2><p id="taskWidgetSubtitle">Deadline terdekat</p></div>
+                <button type="button" class="link-btn" id="goToTasksBtn">Kelola →</button>
+              </div>
+              <div id="taskWidgetEmpty" class="wallet-widget-empty" style="display:none">
+                <svg class="empty-art" viewBox="0 0 120 96" aria-hidden="true" focusable="false"><path d="M20 30l-6-3M18 42h-7M22 18l-3-5" class="ea-spark"/><rect x="34" y="18" width="52" height="62" rx="9" class="ea-line"/><rect x="47" y="12" width="26" height="12" rx="5" class="ea-fill"/><path d="M45 40l4 4 7-8M45 56l4 4 7-8" class="ea-line"/><path d="M62 40h14M62 56h14" class="ea-line"/><circle cx="86" cy="72" r="14" class="ea-badge"/><path d="M79.5 72l4.5 4.5 8-9" class="ea-check"/></svg>
+                <span>Belum ada tugas tercatat.</span>
+                <button type="button" class="btn-outline" id="widgetAddTaskBtn" style="margin-top:10px">+ Tambah Tugas</button>
+              </div>
+              <div class="wallet-mini-list" id="taskWidgetList"></div>
+              <div class="wallet-widget-total"><span>Belum selesai</span><strong id="taskWidgetTotal">0 tugas</strong></div>
+            </article>
+
+            <article class="card bill-widget-card" id="billWidget">
+              <div class="section-head">
+                <div><h2><span class="wg-ico wg-bill"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="13" rx="2.4"/><path d="M3 8.4h14M7 2.6v3M13 2.6v3M6.6 11.8h6.8M6.6 14.4h4"/></svg></span>Tagihan &amp; Tanggungan</h2><p id="billWidgetSubtitle">Jatuh tempo terdekat</p></div>
+                <button type="button" class="link-btn" id="goToBillsBtn">Kelola →</button>
+              </div>
+              <div id="billWidgetEmpty" class="wallet-widget-empty" style="display:none">
+                <svg class="empty-art" viewBox="0 0 140 96" aria-hidden="true" focusable="false"><path d="M30 34l-7-4M28 50h-9M36 22l-4-6M108 28l6-5M112 42h9" class="ea-spark"/><rect x="48" y="16" width="52" height="62" rx="9" class="ea-doc"/><path d="M58 34h30M58 46h30M58 58h18" class="ea-docline"/><circle cx="96" cy="70" r="15" class="ea-badge"/><path d="M89 70l5 5 9-10" class="ea-check"/></svg>
+                <span>Belum ada tanggungan tercatat.</span>
+                <button type="button" class="btn-outline" id="widgetAddBillBtn" style="margin-top:10px">+ Tambah Tagihan</button>
+              </div>
+              <div class="wallet-mini-list" id="billWidgetList"></div>
+              <div class="wallet-widget-total"><span>Total belum dibayar</span><strong id="billWidgetTotal">Rp0</strong></div>
+            </article>
+
+            <article class="card wallet-widget-card" id="dompetWidget">
+              <div class="section-head">
+                <div><h2><span class="wg-ico wg-wallet"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6.5c0-1 .8-1.8 1.8-1.8h9.4c1 0 1.8.8 1.8 1.8v7c0 1-.8 1.8-1.8 1.8H4.8C3.8 15.3 3 14.5 3 13.5v-7Z"/><path d="M13.2 10.2h2.6"/></svg></span>Dompet &amp; Rekening</h2><p>BRImo, SeaBank, GoPay, dll.</p></div>
+                <button type="button" class="link-btn" id="goToWalletsBtn">Kelola →</button>
+              </div>
+              <div id="walletWidgetEmpty" class="wallet-widget-empty" style="display:none">
+                <span>Belum ada rekening yang dipantau.</span>
+                <button type="button" class="btn-outline" id="widgetAddWalletBtn" style="margin-top:10px">+ Tambah Rekening</button>
+              </div>
+              <div class="wallet-mini-list" id="walletWidgetList"></div>
+              <div class="wallet-widget-total"><span>Total semua rekening</span><strong id="walletWidgetTotal">Rp0</strong></div>
+            </article>
+          </div>
+
+          <article class="card transaction-card" id="transaksi">
+            <div class="section-head"><div><h2>Transaksi Terakhir</h2><p>Catatan aktivitas pemasukan dan pengeluaran terbaru</p></div><button class="btn btn-secondary" id="showAll">Lihat semua</button></div>
+            <div class="tx-toolbar">
+              <input type="text" id="txSearch" placeholder="Cari nama transaksi...">
+              <select id="txTypeFilter">
+                <option value="all">Semua Jenis</option>
+                <option value="income">Pemasukan</option>
+                <option value="expense">Pengeluaran</option>
+              </select>
+              <select id="txCategoryFilter"><option value="all">Semua Kategori</option></select>
+            </div>
+            <div class="transactions" id="transactionList">
+              <div class="empty-transactions" id="emptyState"><svg class="icon empty-icon" viewBox="0 0 40 40" style="width:30px;height:30px;margin:0 auto 8px;color:var(--muted)"><rect x="6" y="10" width="28" height="22" rx="3"/><path d="M6 18h28M14 10v8M26 10v8"/></svg><strong>Belum ada transaksi</strong><span>Tekan tombol "Tambah Transaksi" untuk mulai mencatat keuangan.</span></div>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section class="page-section" id="page-dompet">
+        <div class="wallet-page-head">
+          <div><h2 style="font-size:22px;margin:0">Dompet &amp; Rekening</h2><p class="muted" style="margin:6px 0 0">Pantau saldo BRImo, SeaBank, GoPay, DANA, tunai, dan rekening lainnya di satu tempat.</p></div>
+          <button type="button" class="btn btn-primary" id="addWalletBtn">＋ Tambah Rekening</button>
+        </div>
+
+        <div class="card summary-card balance wallet-hero">
+          <div class="summary-heading"><span>Total Saldo Semua Rekening</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M3 6.5c0-1 .8-1.8 1.8-1.8h9.4c1 0 1.8.8 1.8 1.8v7c0 1-.8 1.8-1.8 1.8H4.8C3.8 15.3 3 14.5 3 13.5v-7Z"/><path d="M13.2 10.2h2.6"/></svg></span></div>
+          <div class="amount" id="walletTotalAmount">Rp0</div>
+          <div class="change" id="walletTotalCount">0 rekening dipantau</div>
+        </div>
+
+        <div class="wallet-grid" id="walletGrid"></div>
+        <div class="wallet-empty-state" id="walletEmptyState" style="display:none">
+          <strong>Belum ada rekening ditambahkan</strong>
+          <span>Tambahkan BRImo, SeaBank, GoPay, DANA, atau dompet tunai untuk mulai memantau saldo dari satu dashboard.</span>
+        </div>
+
+        <p class="wallet-note">Saldo dihitung dari saldo awal yang kamu masukkan, ditambah/dikurangi transaksi yang kamu tandai ke rekening tersebut. Karena ini bukan koneksi langsung ke bank/e-wallet, tekan tombol ⟲ pada tiap rekening kapan saja untuk menyamakan saldo di sini dengan saldo asli di aplikasi BRImo/SeaBank/dompet digital kamu.</p>
+      </section>
+
+      <section class="page-section" id="page-asisten">
+        <div class="wallet-page-head">
+          <div><h2 style="font-size:22px;margin:0">🤖 Asisten AI Keuangan</h2><p class="muted" style="margin:6px 0 0">Tanya apa saja soal keuanganmu, atau minta ringkasan &amp; saran otomatis berdasarkan data bulan ini.</p></div>
+        </div>
+
+        <div id="aiKeyWarning" class="bill-banner bill-banner-soon" style="display:none">
+          <span>⚠️ Kamu belum menyetel Groq API Key. Atur dulu di halaman <strong>Profil</strong> supaya Asisten AI bisa dipakai.</span>
+          <button type="button" class="link-btn" id="goToProfileFromAi">Ke Profil →</button>
+        </div>
+
+        <div class="card ai-card">
+          <div class="section-head">
+            <div><h2>Obrolan</h2><p>Ditenagai Groq (gratis & cepat). Bisa langsung menambah tagihan, mencatat transaksi, tandai lunas, dan atur anggaran atas perintahmu.</p></div>
+            <div class="period-tabs">
+              <button type="button" class="btn btn-secondary" id="aiInsightBtn" style="padding:6px 10px;font-size:11px">✨ Ringkasan Otomatis</button>
+              <button type="button" class="btn btn-secondary" id="aiClearChatBtn" style="padding:6px 10px;font-size:11px">🗑 Hapus Obrolan</button>
+            </div>
+          </div>
+
+          <div class="ai-chat-window" id="aiChatWindow">
+            <div class="ai-empty" id="aiChatEmpty">
+              <span>Belum ada obrolan. Coba perintah: "Catat tagihan bayar kos 750rb jatuh tempo tanggal 25" atau tanya "Kemana saja uangku habis bulan ini?"</span>
+            </div>
+          </div>
+
+          <form class="ai-input-row" id="aiChatForm">
+            <input type="text" id="aiChatInput" placeholder="Tulis pertanyaan tentang keuanganmu..." autocomplete="off">
+            <button type="submit" class="btn btn-primary" id="aiSendBtn">Kirim</button>
+          </form>
+          <p class="wallet-note">Asisten AI membaca ringkasan transaksi, anggaran, dompet, dan tagihanmu bulan ini untuk menjawab, dan bisa langsung menambah tagihan/transaksi, menandai tagihan lunas, atau mengatur anggaran kalau kamu memerintahkannya — perubahan langsung tersimpan di aplikasi. Jangan tulis data sensitif (password, PIN, nomor kartu) di kolom chat.</p>
+        </div>
+      </section>
+
+      <section class="page-section" id="page-tagihan">
+        <div class="wallet-page-head">
+          <div><h2 style="font-size:22px;margin:0">Tagihan &amp; Tanggungan</h2><p class="muted" style="margin:6px 0 0">Catat uang yang harus kamu bayar ke pihak tertentu — kos, listrik, wifi, cicilan, atau utang ke teman — lengkap hari &amp; tanggal jatuh temponya.</p></div>
+          <button type="button" class="btn btn-primary" id="addBillBtn">＋ Tambah Tagihan</button>
+        </div>
+
+        <section class="summary-grid">
+          <article class="card summary-card expense"><div class="summary-heading"><span>Belum Dibayar</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M4 3h12v14l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2L4 17V3Z"/><path d="M7.5 7.5h5M7.5 11h3"/></svg></span></div><div class="amount" id="billUnpaidTotal">Rp0</div><div class="change" id="billUnpaidCount">Belum ada tanggungan</div></article>
+          <article class="card summary-card warning"><div class="summary-heading"><span>Jatuh Tempo / Telat</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 6v4.5M10 13.4v.1"/></svg></span></div><div class="amount" id="billDueTotal">Rp0</div><div class="change" id="billDueCount">Aman, tidak ada yang jatuh tempo</div></article>
+          <article class="card summary-card income"><div class="summary-heading"><span>Lunas Bulan Ini</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M6.8 10.2l2.2 2.2 4.2-4.6"/></svg></span></div><div class="amount" id="billPaidTotal">Rp0</div><div class="change" id="billPaidCount">Belum ada yang dilunasi</div></article>
+        </section>
+
+        <div class="card" style="margin-top:22px">
+          <div class="section-head">
+            <div><h2>Daftar Tanggungan</h2><p>Tekan “✓ Lunas” kalau sudah dibayar. Tagihan bulanan otomatis dibuat ulang untuk bulan berikutnya.</p></div>
+            <div class="outlined-field"><span class="outlined-label">Ingatkan sejak</span>
+              <select class="month-filter" id="billReminderDays">
+                <option value="1">H-1</option>
+                <option value="2">H-2</option>
+                <option value="3">H-3</option>
+                <option value="5">H-5</option>
+                <option value="7">H-7</option>
+                <option value="14">H-14</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="media-tabs bill-tabs">
+            <button type="button" class="media-tab active" data-bill-filter="active">Belum Lunas</button>
+            <button type="button" class="media-tab" data-bill-filter="due">Perlu Perhatian</button>
+            <button type="button" class="media-tab" data-bill-filter="paid">Sudah Lunas</button>
+            <button type="button" class="media-tab" data-bill-filter="all">Semua</button>
+          </div>
+
+          <div class="bill-list" id="billList"></div>
+          <div class="media-empty" id="billEmptyState"><span>Belum ada tagihan pada filter ini.</span></div>
+          <p class="wallet-note">Peringatan muncul otomatis di lonceng notifikasi, banner dashboard, dan menu sidebar saat tagihan mendekati atau melewati tanggal jatuh tempo. Data disimpan di browser kamu, jadi ikut terbawa saat Backup Data di halaman Profil.</p>
+        </div>
+      </section>
+
+      <section class="page-section" id="page-tugas">
+        <div class="wallet-page-head">
+          <div><h2 style="font-size:22px;margin:0">Tugas Kampus</h2><p class="muted" style="margin:6px 0 0">Catat tugas kuliah, deadline, mata kuliah, dan bobot nilainya — biar nggak ada yang kelewat &amp; nggak ada begadang dadakan.</p></div>
+          <button type="button" class="btn btn-primary" id="addTaskBtn">＋ Tambah Tugas</button>
+        </div>
+
+        <section class="summary-grid">
+          <article class="card summary-card expense"><div class="summary-heading"><span>Belum Selesai</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><path d="M6 2.5h8a1.5 1.5 0 0 1 1.5 1.5v12.4a1 1 0 0 1-1.45.9L10 15.6l-4.05 1.7A1 1 0 0 1 4.5 16.4V4A1.5 1.5 0 0 1 6 2.5Z"/><path d="M7 7h6M7 10h6"/></svg></span></div><div class="amount" id="taskActiveCount">0</div><div class="change" id="taskActiveNote">Belum ada tugas</div></article>
+          <article class="card summary-card warning"><div class="summary-heading"><span>Mendekati Deadline</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 6v4.5M10 13.4v.1"/></svg></span></div><div class="amount" id="taskDueCount">0</div><div class="change" id="taskDueNote">Aman, tidak ada yang mendesak</div></article>
+          <article class="card summary-card income"><div class="summary-heading"><span>Selesai Bulan Ini</span><span class="card-icon"><svg class="icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M6.8 10.2l2.2 2.2 4.2-4.6"/></svg></span></div><div class="amount" id="taskDoneCount">0</div><div class="change" id="taskDoneNote">Belum ada yang selesai</div></article>
+        </section>
+
+        <div class="card" style="margin-top:22px">
+          <div class="section-head">
+            <div><h2>Daftar Tugas</h2><p>Diurutkan dari deadline paling dekat. Tekan “✓ Selesai” kalau sudah kelar.</p></div>
+          </div>
+
+          <div class="media-tabs task-tabs">
+            <button type="button" class="media-tab active" data-task-filter="active">Belum Selesai</button>
+            <button type="button" class="media-tab" data-task-filter="due">Mendesak</button>
+            <button type="button" class="media-tab" data-task-filter="done">Selesai</button>
+            <button type="button" class="media-tab" data-task-filter="all">Semua</button>
+          </div>
+
+          <div class="bill-list" id="taskList"></div>
+          <div class="media-empty" id="taskEmptyState"><span>Belum ada tugas pada filter ini.</span></div>
+          <p class="wallet-note">Kamu juga bisa minta Asisten AI mencatatkan tugas — coba tulis di halaman Asisten AI, misal: "catat tugas laporan praktikum fisika, deadline Jumat jam 5 sore, bobot 20%".</p>
+        </div>
+      </section>
+
+      <section class="page-section" id="page-kalkulator">
+        <div class="section-head" style="margin-bottom:20px">
+          <div><h2 style="font-size:22px;margin:0">Kalkulator</h2><p class="muted" style="margin:6px 0 0">Alat bantu hitung cepat: kalkulator standar, patungan bareng teman kos, sampai rencana target tabungan.</p></div>
+        </div>
+
+        <div class="calc-tabs">
+          <button type="button" class="calc-tab active" data-calc="standar">🧮 Standar</button>
+          <button type="button" class="calc-tab" data-calc="split">🤝 Split Bill</button>
+          <button type="button" class="calc-tab" data-calc="target">🎯 Target Tabungan</button>
+        </div>
+
+        <div class="calc-panel active" id="calcPanel-standar">
+          <div class="card calc-card">
+            <div class="calc-display">
+              <div class="calc-history" id="calcHistory"></div>
+              <div class="calc-expression" id="calcExpression">0</div>
+            </div>
+            <div class="calc-keys" id="calcKeys">
+              <button type="button" data-calc-key="mc">MC</button>
+              <button type="button" data-calc-key="mr">MR</button>
+              <button type="button" data-calc-key="m-">M−</button>
+              <button type="button" data-calc-key="m+">M+</button>
+
+              <button type="button" data-calc-key="clear">C</button>
+              <button type="button" data-calc-key="back">⌫</button>
+              <button type="button" data-calc-key="percent">%</button>
+              <button type="button" class="calc-op" data-calc-key="divide">÷</button>
+
+              <button type="button" data-calc-key="7">7</button>
+              <button type="button" data-calc-key="8">8</button>
+              <button type="button" data-calc-key="9">9</button>
+              <button type="button" class="calc-op" data-calc-key="multiply">×</button>
+
+              <button type="button" data-calc-key="4">4</button>
+              <button type="button" data-calc-key="5">5</button>
+              <button type="button" data-calc-key="6">6</button>
+              <button type="button" class="calc-op" data-calc-key="subtract">−</button>
+
+              <button type="button" data-calc-key="1">1</button>
+              <button type="button" data-calc-key="2">2</button>
+              <button type="button" data-calc-key="3">3</button>
+              <button type="button" class="calc-op" data-calc-key="add">+</button>
+
+              <button type="button" data-calc-key="00">000</button>
+              <button type="button" data-calc-key="0">0</button>
+              <button type="button" data-calc-key="dot">,</button>
+              <button type="button" class="calc-op calc-equals" data-calc-key="equals">=</button>
+            </div>
+            <div class="calc-actions">
+              <button type="button" class="btn btn-secondary" id="calcClearHistoryBtn">Hapus Riwayat</button>
+              <button type="button" class="btn btn-primary" id="calcUseResultBtn">Gunakan untuk Transaksi →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-panel" id="calcPanel-split">
+          <div class="card calc-card">
+            <div class="section-head"><div><h2>Kalkulator Split Bill</h2><p>Hitung patungan makan/nongkrong bareng teman kos, lengkap pajak/tip.</p></div></div>
+            <div class="form-grid">
+              <label>Total tagihan (Rp)<input type="number" id="splitTotal" min="0" placeholder="Contoh: 150000"></label>
+              <label>Jumlah orang<input type="number" id="splitPeople" min="1" value="2"></label>
+              <label>Pajak / Tip (%)<input type="number" id="splitTax" min="0" value="0" placeholder="Contoh: 10"></label>
+            </div>
+            <div class="split-result">
+              <div class="split-result-row"><span>Total + pajak/tip</span><strong id="splitGrandTotal">Rp0</strong></div>
+              <div class="split-result-row highlight"><span>Per orang</span><strong id="splitPerPerson">Rp0</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-panel" id="calcPanel-target">
+          <div class="card calc-card">
+            <div class="section-head"><div><h2>Kalkulator Target Tabungan</h2><p>Rencanakan berapa yang perlu kamu tabung tiap bulan untuk mencapai targetmu.</p></div></div>
+            <div class="form-grid">
+              <label>Nama target<input type="text" id="goalName" placeholder="Contoh: Laptop baru"></label>
+              <label>Target dana (Rp)<input type="number" id="goalTarget" min="0" placeholder="Contoh: 5000000"></label>
+              <label>Sudah terkumpul (Rp)<input type="number" id="goalCurrent" min="0" placeholder="Contoh: 500000"></label>
+              <label>Tenggat waktu<input type="date" id="goalDeadline"></label>
+            </div>
+            <div class="split-result" id="goalResultBox" style="display:none">
+              <div class="split-result-row"><span>Sisa waktu</span><strong id="goalMonthsLeft">-</strong></div>
+              <div class="split-result-row highlight"><span>Perlu ditabung / bulan</span><strong id="goalPerMonth">Rp0</strong></div>
+              <div class="budget-bar" style="margin-top:14px"><i id="goalProgressBar" style="width:0%;background:var(--gold)"></i></div>
+              <div class="change" id="goalProgressText" style="margin-top:8px"></div>
+            </div>
+            <div class="form-actions" style="justify-content:flex-start;margin-top:20px">
+              <button type="button" class="btn btn-primary" id="goalSaveBtn">💾 Jadikan Target Aktif</button>
+              <button type="button" class="btn btn-secondary" id="goalClearBtn">Hapus Target Aktif</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section" id="page-media">
+        <div class="section-head" style="margin-bottom:20px">
+          <div><h2 style="font-size:22px;margin:0">Galeri</h2><p class="muted" style="margin:6px 0 0">Simpan gambar penting, video YouTube, dan link penting — tinggal klik untuk langsung dibuka.</p></div>
+        </div>
+
+        <div class="media-tabs">
+          <button type="button" class="media-tab active" data-media="images">🖼️ Gambar</button>
+          <button type="button" class="media-tab" data-media="videos">▶️ Video YouTube</button>
+          <button type="button" class="media-tab" data-media="links">🔗 Link Penting</button>
+        </div>
+
+        <div class="media-panel active" id="mediaPanel-images">
+          <div class="card media-card">
+            <div class="section-head">
+              <div><h2>Gambar Penting</h2><p>Simpan foto struk, KTP, kwitansi, atau gambar penting lainnya.</p></div>
+              <label class="btn btn-primary" for="imageUploadInput" style="cursor:pointer">＋ Upload Gambar</label>
+              <input type="file" id="imageUploadInput" accept="image/*" multiple hidden>
+            </div>
+            <div class="media-grid" id="imageGrid"></div>
+            <div class="media-empty" id="imageEmptyState"><span>Belum ada gambar tersimpan. Upload gambar penting kamu di sini.</span></div>
+            <p class="wallet-note" style="margin-top:16px">Gambar disimpan langsung di browser kamu (bukan ke server), jadi pastikan tidak menghapus data browser jika ingin gambar tetap tersimpan.</p>
+          </div>
+        </div>
+
+        <div class="media-panel" id="mediaPanel-videos">
+          <div class="card media-card">
+            <div class="section-head"><div><h2>Video YouTube</h2><p>Tempel link video YouTube, nanti tinggal klik thumbnail untuk langsung nonton di halaman ini.</p></div></div>
+            <form class="form-grid" id="videoForm" style="margin-bottom:22px">
+              <label>Judul video (opsional)<input type="text" id="videoTitle" placeholder="Contoh: Tips hemat ala anak kos"></label>
+              <label>Link YouTube<input type="url" id="videoUrl" required placeholder="https://youtube.com/watch?v=..."></label>
+              <div class="form-actions" style="margin-top:2px;justify-content:flex-start"><button class="btn btn-primary" type="submit">＋ Tambah Video</button></div>
+            </form>
+            <div class="media-grid" id="videoGrid"></div>
+            <div class="media-empty" id="videoEmptyState"><span>Belum ada video tersimpan.</span></div>
+          </div>
+        </div>
+
+        <div class="media-panel" id="mediaPanel-links">
+          <div class="card media-card">
+            <div class="section-head"><div><h2>Link Penting</h2><p>Simpan link penting (invoice, dokumen, e-wallet, dll), klik untuk langsung membuka.</p></div></div>
+            <form class="form-grid" id="linkForm" style="margin-bottom:6px">
+              <label>Nama link<input type="text" id="linkName" required placeholder="Contoh: Invoice kos bulan ini"></label>
+              <label>URL<input type="text" id="linkUrl" required placeholder="https://..."></label>
+              <div class="form-actions" style="margin-top:2px;justify-content:flex-start"><button class="btn btn-primary" type="submit">＋ Tambah Link</button></div>
+            </form>
+            <div class="link-list" id="linkList"></div>
+            <div class="media-empty" id="linkEmptyState"><span>Belum ada link tersimpan.</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Navigasi utama">
+    <button type="button" class="bn-item active" data-go="dashboard"><svg class="icon" viewBox="0 0 20 20"><path d="M3.5 9.2 10 3.6l6.5 5.6v7a1 1 0 0 1-1 1h-3.3v-4.6H7.8v4.6H4.5a1 1 0 0 1-1-1V9.2Z"/></svg><span>Beranda</span></button>
+    <button type="button" class="bn-item" data-go="dompet"><svg class="icon" viewBox="0 0 20 20"><path d="M3 6.5c0-1 .8-1.8 1.8-1.8h9.4c1 0 1.8.8 1.8 1.8v7c0 1-.8 1.8-1.8 1.8H4.8C3.8 15.3 3 14.5 3 13.5v-7Z"/><path d="M13.2 10.2h2.6"/></svg><span>Dompet</span></button>
+    <button type="button" class="bn-add" id="bnAdd" aria-label="Tambah transaksi"><svg class="icon" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>
+    <button type="button" class="bn-item" data-go="tagihan"><svg class="icon" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/><path d="M7.4 12.4l1.8 1.8 3.4-3.6"/></svg><span>Tagihan</span><i class="bn-dot" id="bnBillDot"></i></button>
+    <button type="button" class="bn-item" id="bnMore"><svg class="icon" viewBox="0 0 20 20"><rect x="3" y="3" width="5.4" height="5.4" rx="1.6"/><rect x="11.6" y="3" width="5.4" height="5.4" rx="1.6"/><rect x="3" y="11.6" width="5.4" height="5.4" rx="1.6"/><rect x="11.6" y="11.6" width="5.4" height="5.4" rx="1.6"/></svg><span>Menu</span><i class="bn-dot" id="bnMoreDot"></i></button>
+  </nav>
+
+  <div class="sheet-backdrop" id="moreSheet" role="dialog" aria-modal="true" aria-label="Menu lainnya">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">Menu</h2>
+      <div class="sheet-grid" id="moreGrid"></div>
+    </div>
+  </div>
+
+  <button class="floating-add" id="addTransaction">＋ Tambah Transaksi</button>
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-label="Tambah transaksi">
+    <form class="modal" id="transactionForm">
+      <div class="modal-head"><h2>Tambah Transaksi</h2><button type="button" class="close" id="closeModal">×</button></div>
+      <div class="type-switch"><button type="button" class="active" data-type="expense">Pengeluaran</button><button type="button" data-type="income">Pemasukan</button></div>
+      <input type="hidden" id="transactionType" value="expense" />
+      <input type="hidden" id="editingId" value="" />
+      <div class="form-grid">
+        <label>Nama transaksi<input id="name" required placeholder="Contoh: Belanja mingguan" /></label>
+        <label>Jumlah (Rp)
+          <div class="amount-input-wrap">
+            <input id="amount" required type="number" min="1" placeholder="Contoh: 50000" />
+            <button type="button" class="mini-calc-btn" id="openMiniCalc" title="Buka kalkulator cepat">🧮</button>
+          </div>
+        </label>
+        <label>Tanggal transaksi<input id="transactionDate" required type="date" /></label>
+        <label>Kategori<select id="category"></select></label>
+        <label>Rekening (opsional)<select id="transactionWallet"><option value="">Tanpa rekening (umum)</option></select></label>
+      </div>
+      <div class="form-actions"><button type="button" class="btn btn-secondary" id="cancelModal">Batal</button><button class="btn btn-primary" type="submit">Simpan Transaksi</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="budgetModalBackdrop" role="dialog" aria-modal="true" aria-label="Atur anggaran">
+    <form class="modal" id="budgetForm">
+      <div class="modal-head"><h2>Atur Anggaran Bulanan</h2><button type="button" class="close" id="closeBudgetModal">×</button></div>
+      <div class="form-grid">
+        <label>🍚 Makan & Minum (Rp)<input id="budgetInput-MakanMinum" type="number" min="0" placeholder="Contoh: 800000" /></label>
+        <label>🏠 Kos & Utilitas (Rp)<input id="budgetInput-KosUtilitas" type="number" min="0" placeholder="Contoh: 1000000" /></label>
+        <label>🛵 Transportasi (Rp)<input id="budgetInput-Transportasi" type="number" min="0" placeholder="Contoh: 300000" /></label>
+        <label>☕ Nongkrong (Rp)<input id="budgetInput-Nongkrong" type="number" min="0" placeholder="Contoh: 250000" /></label>
+      </div>
+      <div class="form-actions"><button type="button" class="btn btn-secondary" id="cancelBudgetModal">Batal</button><button class="btn btn-primary" type="submit">Simpan Anggaran</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="walletModalBackdrop" role="dialog" aria-modal="true" aria-label="Tambah rekening">
+    <form class="modal" id="walletForm">
+      <div class="modal-head"><h2 id="walletModalTitle">Tambah Rekening</h2><button type="button" class="close" id="closeWalletModal">×</button></div>
+      <input type="hidden" id="editingWalletId" value="" />
+      <div class="form-grid">
+        <label>Pilih rekening
+          <select id="walletPreset">
+            <option value="BRImo (BRI)|bank">BRImo (BRI)</option>
+            <option value="SeaBank|bank">SeaBank</option>
+            <option value="Bank Jago|bank">Bank Jago</option>
+            <option value="Livin' by Mandiri|bank">Livin' by Mandiri</option>
+            <option value="GoPay|ewallet">GoPay</option>
+            <option value="OVO|ewallet">OVO</option>
+            <option value="DANA|ewallet">DANA</option>
+            <option value="ShopeePay|ewallet">ShopeePay</option>
+            <option value="Tunai|cash">Tunai</option>
+            <option value="custom|other" selected>Nama lain (isi manual)</option>
+          </select>
+        </label>
+        <label id="walletManualNameField">Nama rekening
+          <input type="text" id="walletManualName" placeholder="Contoh: Jenius, Blu, dompet parkir kos" />
+        </label>
+        <label>Jenis
+          <select id="walletType">
+            <option value="bank">Bank</option>
+            <option value="ewallet">E-Wallet</option>
+            <option value="cash">Tunai</option>
+            <option value="other" selected>Lainnya</option>
+          </select>
+        </label>
+        <label>Saldo awal (Rp)
+          <input type="number" id="walletBalanceInput" min="0" placeholder="Contoh: 250000" />
+        </label>
+      </div>
+      <div class="form-actions"><button type="button" class="btn btn-secondary" id="cancelWalletModal">Batal</button><button class="btn btn-primary" type="submit">Simpan Rekening</button></div>
+    </form>
+  </div>
+  </div>
+
+  <div class="modal-backdrop" id="billModalBackdrop" role="dialog" aria-modal="true" aria-label="Tambah tagihan">
+    <form class="modal" id="billForm">
+      <div class="modal-head"><h2 id="billModalTitle">Tambah Tagihan</h2><button type="button" class="close" id="closeBillModal">×</button></div>
+      <input type="hidden" id="editingBillId" value="" />
+      <div class="form-grid">
+        <label>Nama tanggungan<input id="billName" required placeholder="Contoh: Bayar kos September" /></label>
+        <label>Pihak / dibayar ke<input id="billParty" required placeholder="Contoh: Ibu Kos, PLN, Andi" /></label>
+        <label>Jumlah (Rp)<input id="billAmount" required type="number" min="1" placeholder="Contoh: 750000" /></label>
+        <label>Tanggal jatuh tempo<input id="billDueDate" required type="date" /></label>
+        <label>Pengulangan<select id="billRepeat"><option value="once">Sekali bayar</option><option value="monthly">Tiap bulan</option></select></label>
+        <label>Kategori<select id="billCategory"></select></label>
+        <label>Bayar dari rekening (opsional)<select id="billWallet"><option value="">Tanpa rekening (umum)</option></select></label>
+        <label>Catatan (opsional)<input id="billNote" placeholder="Contoh: transfer sebelum jam 17.00" /></label>
+      </div>
+      <div class="form-actions"><button type="button" class="btn btn-secondary" id="cancelBillModal">Batal</button><button class="btn btn-primary" type="submit">Simpan Tagihan</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="taskModalBackdrop" role="dialog" aria-modal="true" aria-label="Tambah tugas kampus">
+    <form class="modal" id="taskForm">
+      <div class="modal-head"><h2 id="taskModalTitle">Tambah Tugas</h2><button type="button" class="close" id="closeTaskModal">×</button></div>
+      <input type="hidden" id="editingTaskId" value="" />
+      <div class="form-grid">
+        <label>Judul tugas<input id="taskTitle" required placeholder="Contoh: Laporan praktikum fisika" /></label>
+        <label>Mata kuliah<input id="taskSubject" required placeholder="Contoh: Fisika Dasar" /></label>
+        <label>Tanggal deadline<input id="taskDeadlineDate" required type="date" /></label>
+        <label>Jam deadline (opsional)<input id="taskDeadlineTime" type="time" /></label>
+        <label>Prioritas<select id="taskPriority"><option value="rendah">Rendah</option><option value="sedang" selected>Sedang</option><option value="tinggi">Tinggi</option></select></label>
+        <label>Status<select id="taskStatusInput"><option value="belum">Belum dikerjakan</option><option value="proses">Sedang dikerjakan</option><option value="selesai">Selesai</option></select></label>
+        <label>Bobot nilai % (opsional)<input id="taskWeight" type="number" min="0" max="100" placeholder="Contoh: 20" /></label>
+        <label>Link tugas (opsional)<input id="taskLink" type="url" placeholder="https://..." /></label>
+        <label>Catatan (opsional)<input id="taskNote" placeholder="Contoh: kirim ke email dosen" /></label>
+      </div>
+      <div class="form-actions"><button type="button" class="btn btn-secondary" id="cancelTaskModal">Batal</button><button class="btn btn-primary" type="submit">Simpan Tugas</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="miniCalcBackdrop" role="dialog" aria-modal="true" aria-label="Kalkulator cepat">
+    <div class="modal calc-card" style="width:min(320px,100%)">
+      <div class="modal-head"><h2 style="font-size:16px">Kalkulator Cepat</h2><button type="button" class="close" id="closeMiniCalc">×</button></div>
+      <div class="calc-display"><div class="calc-expression" id="miniCalcExpression">0</div></div>
+      <div class="calc-keys" id="miniCalcKeys">
+        <button type="button" data-calc-key="clear">C</button>
+        <button type="button" data-calc-key="back">⌫</button>
+        <button type="button" data-calc-key="percent">%</button>
+        <button type="button" class="calc-op" data-calc-key="divide">÷</button>
+
+        <button type="button" data-calc-key="7">7</button>
+        <button type="button" data-calc-key="8">8</button>
+        <button type="button" data-calc-key="9">9</button>
+        <button type="button" class="calc-op" data-calc-key="multiply">×</button>
+
+        <button type="button" data-calc-key="4">4</button>
+        <button type="button" data-calc-key="5">5</button>
+        <button type="button" data-calc-key="6">6</button>
+        <button type="button" class="calc-op" data-calc-key="subtract">−</button>
+
+        <button type="button" data-calc-key="1">1</button>
+        <button type="button" data-calc-key="2">2</button>
+        <button type="button" data-calc-key="3">3</button>
+        <button type="button" class="calc-op" data-calc-key="add">+</button>
+
+        <button type="button" data-calc-key="00">000</button>
+        <button type="button" data-calc-key="0">0</button>
+        <button type="button" data-calc-key="dot">,</button>
+        <button type="button" class="calc-op calc-equals" data-calc-key="equals">=</button>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" id="miniCalcUseBtn" style="width:100%">Gunakan Hasil Ini</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="imageViewBackdrop" role="dialog" aria-modal="true" aria-label="Lihat gambar">
+    <div class="modal image-view-modal">
+      <div class="modal-head"><h2 id="imageViewTitle" style="font-size:16px">Gambar</h2><button type="button" class="close" id="closeImageView">×</button></div>
+      <img id="imageViewImg" src="" alt="Gambar penting" style="width:100%;border-radius:14px;display:block;margin-bottom:18px">
+      <div class="form-actions"><button type="button" class="btn btn-secondary" id="deleteImageBtn">🗑 Hapus Gambar Ini</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="videoPlayBackdrop" role="dialog" aria-modal="true" aria-label="Putar video">
+    <div class="modal video-play-modal">
+      <div class="modal-head"><h2 id="videoPlayTitle" style="font-size:16px">Video</h2><button type="button" class="close" id="closeVideoPlay">×</button></div>
+      <div class="video-embed-wrap"><iframe id="videoPlayFrame" src="" title="Pemutar video YouTube" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+      <div class="form-actions"><button type="button" class="btn btn-secondary" id="deleteVideoBtn">🗑 Hapus Video Ini</button></div>
+    </div>
+  </div>
+
+  <div class="bill-toast" id="billToast">
+    <div class="bill-toast-head"><strong id="billToastTitle">⏰ Ada tagihan jatuh tempo</strong><button type="button" class="close" id="closeBillToast">×</button></div>
+    <div class="bill-toast-body" id="billToastBody"></div>
+    <button type="button" class="btn btn-primary" id="billToastAction" style="width:100%;margin-top:12px">Lihat Tagihan</button>
+  </div>
+
+  <!-- PWA: banner ajakan install (Android/desktop pakai prompt asli, iOS pakai panduan manual) -->
+  <div class="bill-toast pwa-toast" id="pwaInstallToast">
+    <div class="bill-toast-head"><strong id="pwaInstallTitle">📲 Install StastistikDompet</strong><button type="button" class="close" id="closePwaInstallToast">×</button></div>
+    <div class="bill-toast-body" id="pwaInstallBody">Pasang aplikasi ini di layar utama supaya lebih cepat dibuka dan tetap bisa dipakai walau sinyal lemot.</div>
+    <button type="button" class="btn btn-primary" id="pwaInstallAction" style="width:100%;margin-top:12px">Install Sekarang</button>
+  </div>
+
+  <!-- PWA: toast versi baru tersedia -->
+  <div class="bill-toast pwa-toast" id="pwaUpdateToast">
+    <div class="bill-toast-head"><strong>✨ Update tersedia</strong><button type="button" class="close" id="closePwaUpdateToast">×</button></div>
+    <div class="bill-toast-body">Versi baru StastistikDompet sudah siap. Muat ulang untuk memakainya.</div>
+    <button type="button" class="btn btn-primary" id="pwaUpdateAction" style="width:100%;margin-top:12px">Muat Ulang</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+  <script src="Scrip.js"></script>
+  <script src="pwa.js"></script>
+</body>
+</html>
